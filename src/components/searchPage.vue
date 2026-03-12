@@ -66,6 +66,7 @@ export default {
           const formattedPosts = posts.map(post => ({
             id: String(post.post_id),
             img: post.image_path || '/img/back.jpeg',
+            music: post.music_path,
             width: post.width || 200,
             height: post.height || 150,
             avatar_path: post.avatar_path || '/img/default-avatar.png',
@@ -184,13 +185,13 @@ export default {
 .first h1{
   text-align: center;
   font-size: 40px;
-  color: white;
+  color: lightpink;
 }
 .MainSearchBox, .searchedBox{
   width: 80%;
   position: relative;
   margin: 0 auto;
-  background-color: rgb(140,140,140);
+  background-color: /*rgb(140,140,140)*/lightpink;
 }
 .MainSearchBox{
   height: 60px;
@@ -223,7 +224,7 @@ export default {
   right: 5px;
   top:5px;
   background-color: rgba(0,0,0,0);
-  border:2px black solid;
+  border:2px lightcoral solid;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -241,6 +242,6 @@ export default {
   border-radius: 15px;
 }
 .searchButton:hover, .searchedButton:hover{
-  background-color: rgb(90,90,90);
+  background-color: /*rgb(90,90,90)*/lightcoral;
 }
 </style>

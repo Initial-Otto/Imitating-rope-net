@@ -43,6 +43,7 @@ export default {
     // 重置状态并加载
     resetAndLoad() {
       if(this.title !== "cPost"){
+        console.log('wdqhn')
         emitter.emit("changeac", this.activeSection)
       }else {
         this.getCurrentSection()
@@ -84,7 +85,7 @@ export default {
   width: 100px;
   height: 44px;
   margin:3px 10px 3px 10px;
-  background-color: rgb(140,140,140);
+  background-color: lightpink/*rgb(140,140,140)*/;
   color: black;
   text-align: center;
   border-radius: 20px;

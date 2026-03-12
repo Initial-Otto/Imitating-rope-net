@@ -51,7 +51,7 @@ html, body{
 }
 
 *{
-  background-color:rgb(20,20,20);
+  background-color:white/*rgb(20,20,20)*/;
   box-sizing: border-box;
 }
 

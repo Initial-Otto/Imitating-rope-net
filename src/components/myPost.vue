@@ -56,6 +56,7 @@ const sendUserPostsToMainPage = () => {
   const formattedPosts = myPosts.value.map(post => ({
     id: String(post.post_id),
     img: post.image_path || '/img/back.jpeg',
+    music: post.music_path,
     width: post.width || 200,
     height: post.height || 150,
     avatar_path: post.avatar_path || '/img/default-avatar.png',

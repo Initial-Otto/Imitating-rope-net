@@ -291,7 +291,7 @@ export default {
   width: 90%;
   height: auto;
   margin: 0 auto;
-  background-color: rgb(100,100,100);
+  background-color: /*rgb(100,100,100)*/lightpink;
   border-radius: 20px;
   position: relative;
   top:20px
@@ -304,9 +304,10 @@ export default {
   max-width: 500px;
   overflow: hidden;
   z-index: 4;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
 }
 .imgBox h1{
-  color: white;
+  color: black;
   position: relative;
   top: -10px;
   margin: 20px 0 0 20px;
@@ -347,7 +348,7 @@ hr{
   top:20px;
   height: 2px;
   width: 90%;
-  background-color: rgba(0,0,0,0);
+  background-color: black;
 }
 form{
   background-color: rgba(0,0,0,0);
@@ -358,10 +359,10 @@ form{
   width: 90%;
   height: 90%;
   min-height: 750px;
-  background-color: rgb(140,140,140);
+  background-color: /*rgb(140,140,140)*/white;
   border-radius: 20px;
   margin: 40px 0 40px 0;
-  border: 2px black solid;
+  border: 2px lightcoral solid;
   display: grid;
   grid-auto-rows: 100px;
 }
@@ -370,30 +371,34 @@ form{
   font-size: 20px;
   display: flex;
   align-items: center;
+  color: lightpink;
 }
 .detail input[type="text"]{
   font-size: 20px;
   height: 80%;
   width: 80%;
   margin: 10px 0 10px 10px;
-  background-color: rgb(100,100,100);
+  background-color: /*rgb(100,100,100)*/lightpink;
   border-radius: 20px;
+  border: 2px lightcoral solid;
 }
 .ok{
   width: 200px;
   height: 100px;
   margin: 0 auto;
+  position: relative;
+  top: 20px;
   border-radius: 50px;
-  background-color: rgb(50,50,50);
+  background-color: /*rgb(50,50,50)*/lightpink;
   color:  white;
   cursor: pointer;
-  border: 10px black solid;
+  border: 2px lightcoral solid;
   box-shadow: 5px 5px 10px rgba(255,255,255,0.3);
-  transition: background-color 0.5s, transform 0.5s;
+  transition: all 0.5s ease;
 }
 .ok:hover{
-  background-color: rgb(100,100,100);
-  transform: translateY(5px);
+  background-color: /*rgb(100,100,100)*/lightcoral;
+  transform: scale(1.1);
 }
 .panel-overlay {
   position: fixed;

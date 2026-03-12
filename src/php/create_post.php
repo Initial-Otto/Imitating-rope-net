@@ -165,13 +165,44 @@ try {
         $width = 1280;
         $height = 665;
     }
+    $music_path = null; // 初始化音乐路径变量
+    if (isset($_FILES['music']) && $_FILES['music']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = __DIR__ . '/../../public/music/'; // 音乐文件保存目录
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        // 验证文件类型
+        $allowed_types = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/flac'];
+        $file_type = $_FILES['music']['type'];
+        if (!in_array($file_type, $allowed_types)) {
+            throw new Exception('不支持的音乐文件类型，仅支持 MP3, WAV, OGG, M4A, AAC, FLAC 格式');
+        }
+
+        // 验证文件大小（例如限制为 50MB）
+        if ($_FILES['music']['size'] > 50 * 1024 * 1024) {
+            throw new Exception('音乐文件大小不能超过50MB');
+        }
+
+        // 生成唯一文件名，并保留原文件扩展名
+        $file_extension = pathinfo($_FILES['music']['name'], PATHINFO_EXTENSION);
+        $filename = uniqid('music_') . '.' . $file_extension;
+        $music_path = $upload_dir . $filename;
+
+        // 移动文件
+        if (!move_uploaded_file($_FILES['music']['tmp_name'], $music_path)) {
+            throw new Exception('音乐文件上传失败');
+        }
+        // 保存Web访问路径
+        $music_path = '/music/' . $filename;
+    }
 
     // 3. 插入帖子内容表
     $stmt = $pdo->prepare("
-        INSERT INTO post_contents (post_id, content_text, image_path, width, height) 
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO post_contents (post_id, content_text, image_path, width, height, music_path) 
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$post_id, $processed_content, $image_path, $width ?? null, $height ?? null]);
+    $stmt->execute([$post_id, $processed_content, $image_path, $width ?? null, $height ?? null, $music_path]);
 
     // 提交事务
     $pdo->commit();
@@ -185,7 +216,8 @@ try {
             'post_id' => $post_id,
             'title' => $title,
             'section_id' => $section_id,
-            'image_path' => $upload_dir,
+            'image_path' => $image_path,
+            'music_path' => $music_path,
             'content' => $processed_content,
         ]
     ]);
@@ -197,9 +229,14 @@ try {
     }
 
     // 删除已上传的文件（如果有）
-    if (isset($image_path) && file_exists($image_path)) {
-        unlink($image_path);
+    if (isset($image_path) && file_exists($_SERVER['DOCUMENT_ROOT'] . $image_path)) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . $image_path);
     }
+    // 新增：删除已上传的音乐文件
+    if (isset($music_path) && file_exists($_SERVER['DOCUMENT_ROOT'] . $music_path)) {
+        unlink($_SERVER['DOCUMENT_ROOT'] . $music_path);
+    }
+
 
     http_response_code(500);
     error_log("发帖错误: " . $e->getMessage());

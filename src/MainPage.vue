@@ -65,7 +65,7 @@ const loadPosts=async (isReset = false,at = activeSection.value) => {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(params)
       });
-      params.limit = 10
+      params.limit = 20
       const response = await fetch('http://localhost:8000/src/php/get_normal_posts.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -117,6 +117,7 @@ const sendToMainPage=(posts, isReset = false)=> {
   const formattedPosts = posts.map(post => ({
     id: String(post.post_id),
     img: post.image_path || '/img/back.jpeg',
+    music: post.music_path,
     width: post.width || 200,
     height: post.height || 150,
     avatar_path: post.avatar_path || '/img/default-avatar.png',

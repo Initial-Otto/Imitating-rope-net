@@ -44,7 +44,7 @@ export default {
 
           if (result.success) {
             alert(result.message);
-            fetch('http://localhost:8000/src/php/logout.php', {
+            fetch('http://localhost:8000/src/php//logout.php', {
               method: 'POST',
               credentials: 'include'
             })
@@ -163,6 +163,7 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
+  background-color: rgb(20,20,20);
 }
 .box{
   min-height: 600px;

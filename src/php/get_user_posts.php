@@ -40,6 +40,7 @@ try {
             u.avatar_path,
             pc.content_text,
             pc.image_path,
+            pc.music_path,
             pc.width,
             pc.height
         FROM posts p

@@ -32,7 +32,7 @@ export default {
     },
     getImg(type){
       if(type==='background'){
-        this.backgroundImg = "background-image:url(\""+require("@/img/background/back.jpeg")+"\")"
+        this.backgroundImg = "background-image:url(\""+require("@/img/background/angel(1).jpg")+"\")"
       }else if(type === 'pImg'){
         this.pImg = require("@/assets/b.jpg")
       }
@@ -201,19 +201,16 @@ export default {
     <ul class="settings-list">
       <!-- 修改简介 -->
       <li class="setting-item" @click="handleEditProfile">
-        <span class="item-icon">👤</span>
         <span class="item-text">修改简介</span>
       </li>
 
       <!-- 修改密码 -->
       <li class="setting-item" @click="handleChangePassword">
-        <span class="item-icon">🔒</span>
         <span class="item-text">修改密码</span>
       </li>
 
       <!-- 退出登录 -->
       <li class="setting-item" @click="handleLogout">
-        <span class="item-icon">🚪</span>
         <span class="item-text">退出登录</span>
       </li>
     </ul>
@@ -317,6 +314,8 @@ header h2:hover{
   grid-column: 2;
   grid-row: 1;
   background-color: rgba(0,0,0,0);
+  overflow: visible;
+  white-space: nowrap;
 }
 
 
@@ -359,7 +358,7 @@ main{
   width: 60px;
   height: 40px;
   border-radius: 20px;
-  background-color: rgb(100,100,100);
+  background-color: /*rgb(100,100,100)*/lightpink;
   text-align: center;
   line-height:40px;
   color:white;
@@ -438,17 +437,12 @@ main{
 }
 
 .setting-item:hover {
-  background-color: rgb(140,140,140);
+  background-color: /*rgb(140,140,140)*/lightcoral;
 }
 
-.item-icon {
-  margin-right: 10px;
-  font-size: 16px;
-  background-color: rgba(0,0,0,0);
-}
 
 .item-text {
-  color: white;
+  color: pink;
   font-size: 14px;
   background-color: rgba(0,0,0,0);
 }

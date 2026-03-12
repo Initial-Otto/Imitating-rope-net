@@ -6,8 +6,8 @@
           :key="item.id" class="text_menu"
           :style="getCardStyle(index)"
           @click="openPost(item)"
-          :ref="setCardRef"
       >
+<!--          :ref="setCardRef"-->
         <div class="text_menu"
            :style="{
               width:`${state.carPos[index].width}px`,
@@ -26,7 +26,7 @@
               <img :src="item.avatar_path" alt="头像">
             </div>
             <p class="in_text">
-              <span class="title">{{ item.title }}</span><br />{{item.text}}
+              <span class="title">{{ item.title }}</span>
             </p>
           </div>
         </div>
@@ -59,10 +59,11 @@ const state=reactive({
 })
 const isLoading = ref(false)
 const hasMore = ref(true)
-const pageSize = 10
-const cardRefs = ref([])
-const lastCardRef = ref(null)
-const currentObserver = ref(null)
+const pageSize = 20
+
+const isScrolling = ref(false)
+const pipostsReady = ref(false)
+
 const allPosts = ref([])
 const currentSectionId = ref(0)
 const needMoreFromClassify = ref(false)
@@ -75,68 +76,103 @@ const props = defineProps({
   }
 })
 
-// 创建观察者
-const setCardRef = (el) => {
-  if (el) {
-    if (!cardRefs.value.includes(el)) {
-      cardRefs.value.push(el)
-    }
-  }
-}
-watch(() => state.cardList.length, async (newLength) => {
-  if (newLength === 0) return
-
-  await nextTick()
-
-  if (cardRefs.value.length > 0) {
-    lastCardRef.value = cardRefs.value[cardRefs.value.length - 1]
-  }
-
-  createObserverForLastCard()
-})
-const createObserverForLastCard = () => {
-
-  if (currentObserver.value) {
-    currentObserver.value.disconnect()
-    currentObserver.value = null
-  }
-
-  if (!hasMore.value || isLoading.value || !lastCardRef.value) {
+// // 创建观察者
+// const setCardRef = (el) => {
+//   if (el) {
+//     if (!cardRefs.value.includes(el)) {
+//       cardRefs.value.push(el)
+//     }
+//   }
+// }
+// watch(() => state.cardList.length, async (newLength) => {
+//   if (newLength === 0) return
+//
+//   await nextTick()
+//
+//   if (cardRefs.value.length > 0) {
+//     lastCardRef.value = cardRefs.value[cardRefs.value.length - 1]
+//   }
+//
+//   createObserverForLastCard()
+// })
+// const createObserverForLastCard = () => {
+//
+//   if (currentObserver.value) {
+//     currentObserver.value.disconnect()
+//     currentObserver.value = null
+//   }
+//
+//   if (!hasMore.value || isLoading.value || !lastCardRef.value) {
+//     return
+//   }
+//   currentObserver.value= new IntersectionObserver((entries) => {
+//     entries.forEach(entry => {
+//       debouncedObserverCallback(entry)
+//     })
+//   }, {
+//     root: null,
+//     rootMargin: '1px 0px 1px 0px',
+//     threshold: [0, 0.1]
+//   })
+//
+//   try {
+//     currentObserver.value.observe(lastCardRef.value)
+//   } catch (error) {
+//     console.error('观察最后一个卡片失败:', error)
+//   }
+// }
+// const debounce = (func, wait) => {
+//   let timeout
+//   return function executedFunction(...args) {
+//     const later = () => {
+//       clearTimeout(timeout)
+//       func(...args)
+//     }
+//     clearTimeout(timeout)
+//     timeout = setTimeout(later, wait)
+//   }
+// }
+// const debouncedObserverCallback = debounce((entry) => {
+//   if (entry.isIntersecting && !isLoading.value && hasMore.value) {
+//     loadMoreData()
+//     console.log("已触发观察者aaaaaaaaaaa")
+//   }
+// }, 100)
+const checkScrollBottom = () => {
+  // 如果正在加载、没有更多数据、或正在防抖期内，则直接返回
+  if (isLoading.value || !hasMore.value || isScrolling.value) {
     return
   }
-  currentObserver.value= new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      debouncedObserverCallback(entry)
-    })
-  }, {
-    root: null,
-    rootMargin: '1px 0px 1px 0px',
-    threshold: [0, 0.1]
-  })
 
-  try {
-    currentObserver.value.observe(lastCardRef.value)
-  } catch (error) {
-    console.error('观察最后一个卡片失败:', error)
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+  const clientHeight = document.documentElement.clientHeight || window.innerHeight
+  const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight
+
+  // 距离底部 100px 时触发加载，这个阈值可以根据需要调整
+  const threshold = 100
+
+  if (scrollTop + clientHeight >= scrollHeight - threshold) {
+    loadMoreData() // 触发加载
   }
 }
 const debounce = (func, wait) => {
   let timeout
   return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout)
-      func(...args)
-    }
     clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
+    // 设置滚动标志，防止重复触发
+    isScrolling.value = true
+    timeout = setTimeout(() => {
+      isScrolling.value = false
+      func(...args)
+    }, wait)
   }
 }
-const debouncedObserverCallback = debounce((entry) => {
-  if (entry.isIntersecting && !isLoading.value && hasMore.value) {
-    loadMoreData()
-    console.log("已触发观察者aaaaaaaaaaa")
-  }
-}, 100)
+const debouncedScrollHandler = debounce(() => {
+  checkScrollBottom()
+}, 150) // 防抖时间150毫秒，可根据体验调整
+
+
+
 const isRequesting = ref(false)
 
 // 修改 loadMoreData 函数
@@ -183,14 +219,12 @@ const loadMoreData = async () => {
       const remainingLocal = allPosts.value.length - state.cardList.length
       if (remainingLocal <= 0 && needMoreFromClassify.value) {
         if(props.title === 'main'){
-          console.log("main------------")
           emitter.emit('request-more-posts')
         }else if(props.title === 'searchP'){
           emitter.emit('request-more-search')
         }
       } else if (remainingLocal <= 0) {
         hasMore.value = false
-        console.log('没有更多数据了')
       }
 
     } else if (needMoreFromClassify.value) {
@@ -204,7 +238,6 @@ const loadMoreData = async () => {
       // 设置一个超时，防止请求卡住
       setTimeout(() => {
         if (isLoading.value) {
-          console.log('请求超时，重置状态')
           isLoading.value = false
           isRequesting.value = false
         }
@@ -212,7 +245,6 @@ const loadMoreData = async () => {
 
     } else {
       hasMore.value = false
-      console.log('没有更多数据了')
     }
 
   } catch (error) {
@@ -223,13 +255,12 @@ const loadMoreData = async () => {
     setTimeout(() => {
       isLoading.value = false
       isRequesting.value = false
-      console.log(cardRefs.value.length)
+      // console.log(cardRefs.value.length)
       // 重新创建观察者
-      if (cardRefs.value.length > 0) {
-        lastCardRef.value = cardRefs.value[cardRefs.value.length - 1]
-        createObserverForLastCard()
-        console.log("已创建")
-      }
+      // if (cardRefs.value.length > 0) {
+      //   lastCardRef.value = cardRefs.value[cardRefs.value.length - pageSize - 1]
+      //   createObserverForLastCard()
+      // }
     }, 100)
   }
 }
@@ -238,7 +269,6 @@ const fetchMorePosts = async (page, size) => {
   return new Promise((resolve) => {
     // 如果没有数据，返回空数组
     if (!allPosts.value || allPosts.value.length === 0) {
-      console.log('没有可用的帖子数据')
       resolve([])
       return
     }
@@ -259,6 +289,7 @@ const fetchMorePosts = async (page, size) => {
     const normalizedData = pageData.map((post, index) => ({
       id: post.id || `post_${Date.now()}_${index}`,
       img: post.img || '/img/back.jpeg',
+      music:post.music,
       width: post.width || 200,
       height: post.height || 150,
       UPName: post.UPName || '匿名用户',
@@ -299,7 +330,8 @@ const getData = async () => {
       computedCarPos(data, 0)
       const remainingData = allPosts.value.length - state.cardList.length
       needMoreFromClassify.value = remainingData <= 0
-      console.log(`初始化后，剩余数据: ${remainingData}, 需要从classify获取: ${needMoreFromClassify.value}`)
+
+      pipostsReady.value = true
     }
   } catch (error) {
     console.error('初始化数据失败:', error)
@@ -312,7 +344,17 @@ const receivePostData = (data) => {
   if (!data || !data.posts || !Array.isArray(data.posts)) {
     return
   }
-  console.log("已切换")
+  if (data==='isReset'){
+    allPosts.value = []
+    state.cardList = []
+    state.carPos = []
+    state.columnHeight = [0, 0, 0, 0, 0]
+    state.currentPage = 1
+    donot_to_load.value=false
+    currentSectionId.value = data.sectionId
+    return;
+  }
+  console.log("已切换aaaaa")
 
   allPosts.value = []
   state.cardList = []
@@ -324,11 +366,11 @@ const receivePostData = (data) => {
 
   // 存储所有数据
   allPosts.value = data.posts
+  console.log(allPosts.value)
 
   const totalPosts = allPosts.value.length
   const displayedPosts = Math.min(pageSize, totalPosts)
   needMoreFromClassify.value = displayedPosts < totalPosts
-  console.log(`接收数据后，总数: ${totalPosts}, 显示: ${displayedPosts}, 需要更多: ${needMoreFromClassify.value}`)
   hasMore.value = needMoreFromClassify.value || totalPosts > 0
   // 加载第一页数据
   setTimeout(() => {
@@ -337,20 +379,15 @@ const receivePostData = (data) => {
 }
 const handleMorePostsReceived = (data) => {
   if (!data || !data.posts || !Array.isArray(data.posts)) {
-    console.warn('接收到的更多数据格式不正确')
     if(data.pagination.has_more && data.pagination.dont_to_load){
       donot_to_load.value=true
-      console.log("donot_to_load已改变"+donot_to_load.value)
     }
-    console.log("donot_to_load")
     return
   }
 
   if(donot_to_load.value){
     return;
   }
-  console.log(data)
-  console.log(`接收到更多数据，共${data.posts.length}条`)
 
   // 追加数据到allPosts（去重）
   const newPosts = data.posts.filter(newPost => {
@@ -380,6 +417,11 @@ const handleMorePostsReceived = (data) => {
 
   if(!data.pagination.has_more){
     donot_to_load.value=true
+  }
+
+  if(pipostsReady.value){
+    loadMoreData()
+    pipostsReady.value = false
   }
 }
 
@@ -522,7 +564,7 @@ const init = async (num) => {
     state.carPos = []
     state.columnHeight = [0, 0, 0, 0, 0]
     computedCarPos(state.cardList)
-    createObserverForLastCard()
+    // createObserverForLastCard()
   }
 }
 
@@ -546,7 +588,9 @@ onMounted(async ()=>{
       emitter.on('more-search-data', handleMorePostsReceived)
     }
     eventListenersAdded = true
-    console.log('mainPage事件监听器已添加')
+    window.addEventListener('scroll', debouncedScrollHandler, { passive: true })
+
+    window.addEventListener('resize', handleResize)
   }
   await init(0)
 
@@ -562,10 +606,13 @@ onBeforeUnmount(() => {
     eventListenersAdded = false
     console.log('mainPage事件监听器已移除')
   }
-  if (currentObserver.value) {
-    currentObserver.value.disconnect()
-    currentObserver.value = null
-  }
+  // if (currentObserver.value) {
+  //   currentObserver.value.disconnect()
+  //   currentObserver.value = null
+  // }
+  window.removeEventListener('scroll', debouncedScrollHandler)
+
+  window.removeEventListener('resize', handleResize)
 
   window.removeEventListener('resize', handleResize)
 });
@@ -591,7 +638,7 @@ main {
   top:0;
   left: 0;
   border-radius:20px 20px 5px 20px;
-  background-color:rgb(40,40,40);
+  background-color:white/*rgb(40,40,40)*/;
   min-height:120px;
   z-index:1;
   transition:transform 0.5s;
@@ -613,7 +660,7 @@ main {
   position: absolute;
   bottom: 0;
   border-radius: 0 0 5px 20px;
-  background-color:rgb(30,30,30);
+  background-color:lightpink/*rgb(30,30,30)*/;
   width:100%;
   height:80px;
   z-index: 2;
@@ -622,7 +669,7 @@ main {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: rgb(30,30,30);
+  background-color: lightpink/*rgb(30,30,30)*/;
   position: absolute;
   top: -25px;
   left: 5px;
@@ -638,18 +685,18 @@ main {
   left: 1px;
   font-size: 10pt;
   color: rgb(50,50,50);
-  background-color: rgb(30,30,30);
+  background-color: lightpink/*rgb(30,30,30)*/;
 }
 .menu_line{
   height:1px;
-  width:140px;
+  width:50%;
   background-color:rgb(50,50,50);
   position:absolute;
   top:20px;
   left:55px;
 }
 .in_text {
-  background-color: rgb(30,30,30);
+  background-color: lightpink/*rgb(30,30,30)*/;
   height: 52px;
   width: 90%;
   position: absolute;
@@ -680,8 +727,9 @@ main {
   transform: scale(1.2)
 }
 .title{
-  font-size:13pt;
+  font-size:15pt;
   color:white;
+  background-color: lightpink;
 }
 
 

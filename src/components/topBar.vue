@@ -11,7 +11,7 @@
         <div class="now" :style="eNow" v-if="!first"></div>
       </div>
     </div>
-    <div class="logo"><img src="@/assets/LOGO.svg"></div>
+    <div class="logo"><img src="@/assets/pinkLOGO.svg"></div>
     <div class="menu_box">
       <!-- 左侧SVG：圆角矩形 -->
       <svg
@@ -28,7 +28,7 @@
         <text x="100" y="50"
               text-anchor="middle"
               dominant-baseline="middle"
-              fill="white"
+              fill="black"
               font-family="Arial"
               font-size="30"
               font-weight="bold">
@@ -51,7 +51,7 @@
         <text x="110" y="50"
               text-anchor="middle"
               dominant-baseline="middle"
-              fill="white"
+              fill="black"
               font-family="Arial"
               font-size="30"
               font-weight="bold">
@@ -189,7 +189,7 @@ header{
   display:flex;
   justify-content: space-between;
   align-items:center;
-  background-color:black;
+  background-color:lightpink/*black*/;
   width:100%;
   height:100px;
   position:fixed;
@@ -206,8 +206,8 @@ header{
   max-width: 250px;
   height: 50px;
   border-radius: 25px;
-  background-color: rgb(30 30 30);
-  box-shadow:inset 0 1px 1px rgba(255,255,255,0.2);
+  background-color: white/*rgb(30,30,30)*/;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   top:5%;
   left: 2%;
   transition:transform 0.5s;
@@ -218,7 +218,7 @@ header{
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: rgb(50,50,50);
+  background-color: /*rgb(50,50,50)*/lightpink;
   position: absolute;
   top: 5px;
   left: 5px;
@@ -226,7 +226,7 @@ header{
   justify-content: center;
   align-items: center;
   transition:transform 0.5s;
-  box-shadow:inset 0 1px 2px rgba(225,225,225,0.2);
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
   cursor:pointer;
   color:white;
   flex: none;
@@ -240,10 +240,10 @@ header{
 }
 /* 个人等级*/
 .level {
-  background-color: rgba(30,30,30,0.1);
+  background-color: white/*rgba(30,30,30,0.1)*/;
   min-height:40px;
   min-width:40px;
-  color: white;
+  color: black;
   font-size: 10pt;
   text-align: center;
   position: absolute;
@@ -257,15 +257,17 @@ header{
   top:5px;
   left:25%;
   max-width:90px;
-  background-color:rgba(30,30,30,0.1);
-  color:white;
+  background-color:white/*rgba(30,30,30,0.1)*/;
+  color:black;
   margin:0;
+  overflow: visible;
+  white-space: nowrap;
 }
 /*等级进度条*/
 .progress-container {
   height: 10px;
   width: 45%;
-  background-color: rgb(40 40 40);
+  background-color: lightpink/*rgb(40 40 40)*/;
   box-shadow: inset 0 0 2px rgba(255,255,255,0.2);
   border-radius: 5px;
   position: absolute;
@@ -293,7 +295,7 @@ header{
   z-index: 1;
   top: 5%;
   flex: none;
-  background: black;
+  background: rgba(0,0,0,0);
 
 }
 
@@ -397,7 +399,8 @@ header{
 }
 .menu-svg-left:not(.clicked) rect,
 .menu-svg-right:not(.clicked) rect {
-  fill: #323232 !important;
+  /*修改这里*/
+  fill: #FFFFFF !important;
   animation: none;
 }
 

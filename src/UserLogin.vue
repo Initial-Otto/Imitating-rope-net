@@ -99,6 +99,7 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
+  background-color: rgb(20,20,20);
 }
 .box{
   min-height: 500px;

@@ -51,7 +51,6 @@ try {
     if ($user && password_verify($password, $user['password_hash'])) {
         // 登录成功
         session_start();
-        $baseUrl = "http://localhost:8081";
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['logged_in'] = true;
         $_SESSION['account'] = $user['account'];
@@ -59,12 +58,7 @@ try {
         $_SESSION['username'] = $user['username'];
         $_SESSION['level'] = $user['level'];
         $_SESSION['experience'] = $user['experience'];
-        $avatarUrl = $user['avatar_path'] ? $baseUrl . '/' . ltrim($user['avatar_path'], '/') : null;
-        $_SESSION['avatar_path'] = $avatarUrl;
-        $user['avatar_path'] = $avatarUrl;
-
-         // 根据你的实际域名修改
-
+        $_SESSION['avatar_path'] = $user['avatar_path'];
 
         session_write_close(); // 强制写入会话数据
         // 返回用户信息（密码哈希除外）
